@@ -1,148 +1,202 @@
-# Smart Meeting Scheduler
+# 🚀 **ZofriPlan**
 
-## Introduction
-Smart Meeting Scheduler is an AI-powered web application that streamlines meeting scheduling and management. It integrates with Google Calendar to provide a seamless experience for planning, scheduling, and managing meetings. The application leverages Google's Gemini AI to generate intelligent meeting summaries and suggest optimal meeting times based on participants' availability.
+> **AI‑powered scheduling that finds the perfect time so you don’t have to.**
 
-## Features
-- **Google Authentication**: Secure sign-in with Google OAuth 2.0
-- **Google Calendar Integration**: View, create, and manage calendar events directly
-- **AI-Powered Meeting Summaries**: Daily summaries of your scheduled meetings
-- **Intelligent Time Suggestions**: AI-recommended meeting slots based on participant availability
-- **Mock Data Mode**: Development mode using sample data when API access is limited
-- **Responsive Design**: Fully responsive UI that works on desktop and mobile devices
+![License](https://img.shields.io/badge/license-MIT-blue.svg)  
+_Seamlessly integrates Google Calendar & Google Gemini to book, summarise and manage meetings in seconds._
 
-## Technology Stack
-- **Frontend**: React 18, Material UI v5
-- **State Management**: React Context API
-- **Authentication**: Firebase Authentication with Google SSO
-- **Calendar Integration**: Google Calendar API v3
-- **AI Integration**: Google Gemini API (gemini-2.0-flash model)
-- **Animations**: Framer Motion, GSAP
-- **Development**: Create React App, ESLint, Prettier
+---
 
-## Prerequisites
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-- A Google Cloud Platform account with:
-  - Google Calendar API enabled
-  - OAuth 2.0 Client ID configured
-  - Gemini API key
-- Firebase project for authentication
+## ✨ Key Features
 
-## Installation and Setup
+- **Google SSO & OAuth 2.0** — one‑click sign‑in with enterprise‑grade security.  
+- **Calendar Sync** — view, create and edit events directly in Google Calendar.  
+- **Gemini AI Summaries** — instant natural‑language recaps of the day’s meetings.  
+- **Smart Time Suggestions** — AI proposes the best slots based on every attendee’s availability.  
+- **Responsive UI** — built with React 18 & MUI v5; feels at home on desktop _and_ mobile.  
+- **Mock‑Data Mode** — keep coding when APIs are rate‑limited or offline.
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ZofriPlan
-   ```
+---
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+## 📸 App Walk‑through
 
-3. **Create a `.env` file in the project root with the following variables:**
-   ```
-   # Firebase configuration
-   REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
-   REACT_APP_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-   REACT_APP_FIREBASE_PROJECT_ID=your_firebase_project_id
-   REACT_APP_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-   REACT_APP_FIREBASE_APP_ID=your_firebase_app_id
-   REACT_APP_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
+### 1&nbsp;/&nbsp;Authentication & Dashboard
+<table>
+<tr>
+  <td align="center" width="50%">
+    <img src="Screenshot/1. Login.png" alt="Login Screen" width="95%"/><br/>
+    <i>Google SSO login</i>
+  </td>
+  <td align="center" width="50%">
+    <img src="Screenshot/2. Auth.png" alt="OAuth Consent" width="95%"/><br/>
+    <i>OAuth consent flow</i>
+  </td>
+</tr>
+<tr>
+  <td align="center" colspan="2">
+    <img src="Screenshot/3. Dashboard.png" alt="Dashboard" width="90%"/><br/>
+    <i>Personal dashboard with AI meeting summary</i>
+  </td>
+</tr>
+</table>
 
-   # Google OAuth client ID and secret
-   REACT_APP_GOOGLE_CLIENT_ID=your_google_client_id
-   REACT_APP_GOOGLE_CLIENT_SECRET=your_google_client_secret
+### 2&nbsp;/&nbsp;Scheduling a Meeting
+<table>
+<tr>
+  <td align="center" width="50%">
+    <img src="Screenshot/4. Meeting Schedule.png" alt="Schedule Meeting" width="95%"/><br/>
+    <i>Create a new meeting</i>
+  </td>
+  <td align="center" width="50%">
+    <img src="Screenshot/5. AI Suggestion.png" alt="AI Suggestions" width="95%"/><br/>
+    <i>Gemini‑powered time suggestions</i>
+  </td>
+</tr>
+<tr>
+  <td align="center" width="50%">
+    <img src="Screenshot/6. Confirm Schedule.png" alt="Confirm" width="95%"/><br/>
+    <i>Confirmation dialog</i>
+  </td>
+  <td align="center" width="50%">
+    <img src="Screenshot/7. Meeting Scheduled.png" alt="Scheduled" width="95%"/><br/>
+    <i>Success toast</i>
+  </td>
+</tr>
+<tr>
+  <td align="center" colspan="2">
+    <img src="Screenshot/8. Booked.png" alt="Booked" width="90%"/><br/>
+    <i>Event added to calendar</i>
+  </td>
+</tr>
+</table>
 
-   # Gemini API key
-   REACT_APP_GEMINI_API_KEY=your_gemini_api_key
-   ```
+### 3&nbsp;/&nbsp;Profile & Notifications
+<table>
+<tr>
+  <td align="center" width="50%">
+    <img src="Screenshot/9. Profile.png" alt="Profile" width="95%"/><br/>
+    <i>User profile page</i>
+  </td>
+  <td align="center" width="50%">
+    <img src="Screenshot/Email confirmation.jpeg" alt="Email Confirmation" width="95%"/><br/>
+    <i>Email confirmation for every booking</i>
+  </td>
+</tr>
+</table>
 
-4. **Configure Google Cloud OAuth:**
-   - Go to Google Cloud Console > APIs & Services > Credentials
-   - Configure your OAuth consent screen
-   - Create an OAuth 2.0 Client ID for a Web application
-   - Add authorized JavaScript origins:
-     - `http://localhost:3000` (for local development)
-     - Your production domain (if deployed)
-   - Add authorized redirect URIs for Firebase Auth (typically `https://your-firebase-domain.firebaseapp.com/__/auth/handler`)
+---
 
-5. **Start the development server**
-   ```bash
-   npm start
-   ```
+## 🛠️ Tech Stack
 
-## Project Structure
+| Layer | Tech |
+|-------|------|
+| **Frontend** | React 18, Material‑UI v5, Framer Motion, GSAP |
+| **State**    | React Context API |
+| **Auth**     | Firebase Authentication (Google SSO) |
+| **APIs**     | Google Calendar API v3, Google Gemini (gemini‑2.0‑flash) |
+| **Tooling**  | Vite + ESLint + Prettier |
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone
+$ git clone https://github.com/your‑org/smart‑meeting‑scheduler.git
+$ cd smart‑meeting‑scheduler
+
+# 2. Install deps
+$ npm install
+
+# 3. Environment variables
+$ cp .env.example .env       # then fill in your keys
+
+# 4. Run dev server
+$ npm run dev
 ```
-/src
-  /components        # Reusable UI components
-  /contexts          # React contexts for state management
-  /pages             # Page components
-  /services          # API service integrations
-    - aiService.js   # Gemini AI integration
-    - calendarService.js # Google Calendar integration
-    - userService.js # User profile management
-  /utils             # Utility functions
-  /styles            # Global styles and themes
-  App.js             # Main application component
-  index.js           # Entry point
-  config.js          # Configuration settings
+
+<details>
+<summary>Environment variables (.env)</summary>
+
+```
+# Firebase
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_APP_ID=...
+
+# Google OAuth
+VITE_GOOGLE_CLIENT_ID=...
+VITE_GOOGLE_CLIENT_SECRET=...
+
+# Gemini
+VITE_GEMINI_API_KEY=...
+```
+</details>
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+ ├─ assets/            # static images & logos
+ ├─ components/        # reusable UI widgets
+ ├─ contexts/          # React providers (auth, calendar, ai)
+ ├─ pages/             # route components
+ ├─ services/          # external API wrappers
+ │   ├─ aiService.ts
+ │   ├─ calendarService.ts
+ │   └─ userService.ts
+ ├─ styles/            # global MUI theme + SCSS
+ ├─ utils/             # helpers & guards
+ ├─ App.tsx            # top‑level router
+ └─ main.tsx           # Vite entry
 ```
 
-## Configuration Options
+---
 
-In `src/config.js`, you can modify the following settings:
+## 🐛 Troubleshooting
 
-- `useMockData`: Toggle between real API data and mock data for development
-- Google API configuration (scopes, discovery documents)
-- Other application settings
+<details>
+<summary>Google Calendar errors</summary>
 
-## Troubleshooting
+1. Double‑check that your OAuth client has **Calendar API** enabled.  
+2. Ensure `http://localhost:3000` is an authorised origin _and_ redirect URI.  
+3. Verify the requested scope `https://www.googleapis.com/auth/calendar` matches the console.
+</details>
 
-### Google Calendar Integration Issues
+<details>
+<summary>Gemini API errors</summary>
 
-If you encounter Google Calendar API errors:
+- Confirm the API key in `.env` and check usage quotas in Google Cloud.
+</details>
 
-1. Verify that your OAuth 2.0 Client ID is correctly configured in the Google Cloud Console
-2. Ensure `http://localhost:3000` is added as an authorized JavaScript origin
-3. Check that the correct scopes are being requested (`https://www.googleapis.com/auth/calendar`)
-4. Try setting `useMockData: true` in `config.js` temporarily while troubleshooting
-5. Remember that Google OAuth changes can take up to an hour to propagate
+---
 
-### Gemini API Issues
+## 🚢 Deployment
 
-If you encounter errors with the Gemini API:
+| Target | Steps |
+|--------|-------|
+| **Firebase Hosting** | `npm run build && firebase deploy` |
+| **Vercel / Netlify** | Import repo → set env vars → auto‑deploy |
 
-1. Verify your API key is correctly set in the `.env` file
-2. Check your API usage quotas in the Google Cloud Console
-3. Ensure your application has correct permissions to use the API
+---
 
-## Deployment
+## 🤝 Contributors
 
-### Firebase Hosting
+<table>
+<tr>
+  <td align="center"><a href="https://github.com/abhiishekyadav"><img src="https://avatars.githubusercontent.com/abhiishekyadav" width="80"/><br/><sub>Abhishek Yadav</sub></a></td>
+  <td align="center"><a href="#"><img src="https://avatars.githubusercontent.com/u/000000?v=4" width="80"/><br/><sub>Shiva Khatri</sub></a></td>
+  <td align="center"><a href="#"><img src="https://avatars.githubusercontent.com/u/000000?v=4" width="80"/><br/><sub>Aayush Yadav</sub></a></td>
+  <td align="center"><a href="#"><img src="https://avatars.githubusercontent.com/u/000000?v=4" width="80"/><br/><sub>Prerana Poudel</sub></a></td>
+</tr>
+</table>
 
-1. Install the Firebase CLI:
-   ```bash
-   npm install -g firebase-tools
-   ```
+---
 
-2. Initialize Firebase:
-   ```bash
-   firebase login
-   firebase init
-   ```
+## 📜 License
 
-3. Build and deploy:
-   ```bash
-   npm run build
-   firebase deploy
-   ```
+Released under the [MIT](LICENSE) license.
 
-## Contributors
-- [Abhishek Yadav Shiva Khatri Aayush Yadav Prerana Poudel ]
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
