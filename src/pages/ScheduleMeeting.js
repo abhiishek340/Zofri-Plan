@@ -176,38 +176,94 @@ function ScheduleMeeting() {
     }
   };
 
+  // const scheduleMeeting = async () => {
+  //   if (!validateStep()) return;
+    
+  //   setLoading(true);
+  //   try {
+  //     // Parse attendees from comma-separated string to array
+  //     const attendeeList = attendees.split(',').map(email => email.trim());
+
+  //     console.log("Attendees:", attendeeList);
+      
+  //     // Create calendar event
+  //     // const result = await createCalendarEvent({
+  //     //   title,
+  //     //   description,
+  //     //   attendees: attendeeList,
+  //     //   startTime: selectedTime.start,
+  //     //   endTime: selectedTime.end,
+  //     //   location: location
+  //     // });
+      
+  //     // console.log("Created meeting:", result);
+      
+  //     setSuccess('Meeting successfully scheduled!');
+  //     handleNext();
+  //   } catch (err) {
+  //     console.error('Error scheduling meeting:', err);
+  //     setError('Failed to schedule meeting. Please try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
   const scheduleMeeting = async () => {
     if (!validateStep()) return;
     
     setLoading(true);
     try {
       // Parse attendees from comma-separated string to array
-      const attendeeList = attendees.split(',').map(email => email.trim());
-
+      const attendeeList = attendees
+        .split(',')
+        .map(email => email.trim())
+        .filter(email => email);
+      
       console.log("Attendees:", attendeeList);
       
-      // Create calendar event
-      const result = await createCalendarEvent({
-        title,
-        description,
-        attendees: attendeeList,
-        startTime: selectedTime.start,
-        endTime: selectedTime.end,
-        location: location
+      if (attendeeList.length === 0) {
+        throw new Error('Please enter at least one valid attendee email');
+      }
+      
+      // Send meeting invitations via email
+      const response = await fetch('http://localhost:5000/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meetingDetails: {
+            title,
+            description,
+            attendees: attendeeList,
+            startTime: selectedTime.start,
+            endTime: selectedTime.end,
+            location: location || 'Virtual Meeting'
+          },
+          sender: {
+            name: 'ZofriPlan Scheduler',
+            email: 'abhiishek340@gmail.com' // Use your configured email
+          }
+        })
       });
       
-      console.log("Created meeting:", result);
+      const data = await response.json();
       
-      setSuccess('Meeting successfully scheduled!');
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send meeting invitations');
+      }
+      
+      console.log("Email sending result:", data);
+      setSuccess('Meeting successfully scheduled and invitations sent!');
       handleNext();
     } catch (err) {
       console.error('Error scheduling meeting:', err);
-      setError('Failed to schedule meeting. Please try again.');
+      setError(err.message || 'Failed to schedule meeting. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  
   const formatDateTime = (dateTimeString) => {
     const options = { 
       weekday: 'long', 
