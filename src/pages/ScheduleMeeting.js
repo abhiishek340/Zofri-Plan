@@ -183,6 +183,8 @@ function ScheduleMeeting() {
     try {
       // Parse attendees from comma-separated string to array
       const attendeeList = attendees.split(',').map(email => email.trim());
+
+      console.log("Attendees:", attendeeList);
       
       // Create calendar event
       const result = await createCalendarEvent({
@@ -763,7 +765,7 @@ function ScheduleMeeting() {
                       borderRadius: 2
                     }}
                   >
-                    Schedule Meeting
+                    Schedule Meeting 
                   </Button>
                 </Box>
               </motion.div>
