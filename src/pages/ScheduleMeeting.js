@@ -43,6 +43,7 @@ import { suggestMeetingTimes } from '../services/aiService';
 import { createCalendarEvent } from '../services/calendarService';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import Confetti from 'react-confetti';
 
 function ScheduleMeeting() {
   const [activeStep, setActiveStep] = useState(0);
@@ -176,39 +177,6 @@ function ScheduleMeeting() {
     }
   };
 
-  // const scheduleMeeting = async () => {
-  //   if (!validateStep()) return;
-    
-  //   setLoading(true);
-  //   try {
-  //     // Parse attendees from comma-separated string to array
-  //     const attendeeList = attendees.split(',').map(email => email.trim());
-
-  //     console.log("Attendees:", attendeeList);
-      
-  //     // Create calendar event
-  //     // const result = await createCalendarEvent({
-  //     //   title,
-  //     //   description,
-  //     //   attendees: attendeeList,
-  //     //   startTime: selectedTime.start,
-  //     //   endTime: selectedTime.end,
-  //     //   location: location
-  //     // });
-      
-  //     // console.log("Created meeting:", result);
-      
-  //     setSuccess('Meeting successfully scheduled!');
-  //     handleNext();
-  //   } catch (err) {
-  //     console.error('Error scheduling meeting:', err);
-  //     setError('Failed to schedule meeting. Please try again.');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
   const scheduleMeeting = async () => {
     if (!validateStep()) return;
     
@@ -248,22 +216,50 @@ function ScheduleMeeting() {
       
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send meeting invitations');
+      // Also store the meeting in localStorage for dashboard display
+      try {
+        // Create meeting object
+        const newMeeting = {
+          id: `meeting-${Date.now()}`, // Generate a unique ID
+          summary: title,
+          description,
+          attendees: attendeeList.map(email => ({ email })),
+          start: { dateTime: selectedTime.start },
+          end: { dateTime: selectedTime.end },
+          location: location || 'Virtual Meeting',
+          organizer: { self: true }
+        };
+        
+        // Get existing calendar events from localStorage
+        const existingEvents = localStorage.getItem('calendarEvents');
+        let updatedEvents = [];
+        
+        if (existingEvents) {
+          // Add new meeting to existing events
+          updatedEvents = [...JSON.parse(existingEvents), newMeeting];
+        } else {
+          // Create new array with just this meeting
+          updatedEvents = [newMeeting];
+        }
+        
+        // Save back to localStorage
+        localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
+        console.log('Meeting saved to localStorage');
+      } catch (storageErr) {
+        console.error('Error saving meeting to localStorage:', storageErr);
+        // Continue since email was still sent
       }
       
-      console.log("Email sending result:", data);
-      setSuccess('Meeting successfully scheduled and invitations sent!');
+      setSuccess('Meeting successfully scheduled!');
       handleNext();
     } catch (err) {
       console.error('Error scheduling meeting:', err);
-      setError(err.message || 'Failed to schedule meeting. Please try again.');
+      setError('Failed to schedule meeting. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  
   const formatDateTime = (dateTimeString) => {
     const options = { 
       weekday: 'long', 
@@ -833,6 +829,14 @@ function ScheduleMeeting() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, type: 'spring' }}
               >
+                <Confetti
+                  width={window.innerWidth}
+                  height={window.innerHeight}
+                  recycle={false}
+                  numberOfPieces={500}
+                  gravity={0.15}
+                />
+                
                 <Box 
                   sx={{ 
                     textAlign: 'center', 

@@ -16,7 +16,11 @@ import {
   Avatar,
   IconButton,
   Tooltip,
-  
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Container
 } from '@mui/material';
 import { 
@@ -30,7 +34,8 @@ import {
   Alarm as AlarmIcon,
   Analytics as AnalyticsIcon,
   CalendarMonth,
-  CalendarToday
+  CalendarToday,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,6 +54,8 @@ function Dashboard() {
   const navigate = useNavigate();
   const theme = useTheme();
   const [refreshing, setRefreshing] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [meetingToDelete, setMeetingToDelete] = useState(null);
 
   // Animation variants
   const containerVariants = {
@@ -89,15 +96,36 @@ function Dashboard() {
       try {
         setLoading(true);
         
-        // Fetch calendar events from Google Calendar
-        const events = await fetchCalendarEvents();
-        console.log("Fetched events:", events);
-        setUpcomingMeetings(events);
+        // Check if we have cached events in localStorage
+        let events = [];
+        try {
+          const cachedEvents = localStorage.getItem('calendarEvents');
+          if (cachedEvents) {
+            events = JSON.parse(cachedEvents);
+            console.log("Loaded events from localStorage:", events);
+            setUpcomingMeetings(events);
+          } else {
+            // Fetch calendar events from Google Calendar if no cache
+            events = await fetchCalendarEvents();
+            console.log("Fetched events from API:", events);
+            setUpcomingMeetings(events);
+            
+            // Store events in local storage
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+          }
+        } catch (storageErr) {
+          console.error('Error accessing localStorage:', storageErr);
+          // Fetch from API if localStorage fails
+          events = await fetchCalendarEvents();
+          setUpcomingMeetings(events);
+        }
         
         // Get AI-generated daily summary
         if (events.length > 0) {
           const aiSummary = await getDailySummary(events);
           setSummary(aiSummary);
+        } else {
+          setSummary('');
         }
       } catch (err) {
         console.error('Error loading dashboard data:', err);
@@ -108,6 +136,21 @@ function Dashboard() {
     };
     
     loadDashboardData();
+    
+    // Add event listener to refresh dashboard when localStorage changes
+    const handleStorageChange = (e) => {
+      if (e.key === 'calendarEvents') {
+        console.log('Calendar events updated in localStorage, refreshing dashboard');
+        loadDashboardData();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Clean up the event listener
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [currentUser]);
 
   const refreshDashboard = async () => {
@@ -117,6 +160,13 @@ function Dashboard() {
       // Fetch calendar events from Google Calendar
       const events = await fetchCalendarEvents();
       setUpcomingMeetings(events);
+      
+      // Update local storage with fresh data
+      try {
+        localStorage.setItem('calendarEvents', JSON.stringify(events));
+      } catch (storageErr) {
+        console.error('Error updating localStorage:', storageErr);
+      }
       
       // Get AI-generated daily summary
       if (events.length > 0) {
@@ -157,6 +207,57 @@ function Dashboard() {
     } else {
       return "Good Evening";
     }
+  };
+
+  const handleDeleteClick = (meeting) => {
+    setMeetingToDelete(meeting);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!meetingToDelete) return;
+    
+    // First, update UI by removing the meeting from state
+    const filteredMeetings = upcomingMeetings.filter(
+      meeting => meeting.id !== meetingToDelete.id
+    );
+    setUpcomingMeetings(filteredMeetings);
+    
+    // Then, try to update local storage
+    try {
+      // Get current data from localStorage to ensure we're not overwriting other changes
+      const currentStoredData = localStorage.getItem('calendarEvents');
+      
+      // If we have stored data, filter out the meeting to delete
+      if (currentStoredData) {
+        const storedMeetings = JSON.parse(currentStoredData).filter(
+          meeting => meeting.id !== meetingToDelete.id
+        );
+        localStorage.setItem('calendarEvents', JSON.stringify(storedMeetings));
+      } else {
+        // If no stored data, just save the filtered meetings
+        localStorage.setItem('calendarEvents', JSON.stringify(filteredMeetings));
+      }
+      
+      console.log('Meeting deleted from localStorage:', meetingToDelete.id);
+    } catch (storageErr) {
+      console.error('Error updating localStorage after delete:', storageErr);
+      setError('Failed to update storage. Changes may not persist after reload.');
+    }
+    
+    // If there are no meetings left, update the summary
+    if (filteredMeetings.length === 0) {
+      setSummary('');
+    }
+    
+    // Reset the UI state
+    setDeleteDialogOpen(false);
+    setMeetingToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setMeetingToDelete(null);
   };
 
   if (loading) {
@@ -580,8 +681,20 @@ function Dashboard() {
                                 </Grid>
                               </Box>
                               
-                              {/* Join button or action */}
-                              <Box ml={2} mt={1}>
+                              {/* Action buttons */}
+                              <Box ml={2} mt={1} display="flex">
+                                {/* Delete button */}
+                                <Tooltip title="Delete meeting">
+                                  <IconButton 
+                                    color="error"
+                                    onClick={() => handleDeleteClick(meeting)}
+                                    sx={{ mr: 1 }}
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                
+                                {/* Existing view details button */}
                                 <Tooltip title="View details">
                                   <IconButton 
                                     color="primary"
@@ -605,6 +718,29 @@ function Dashboard() {
           </Grid>
         </Grid>
       </motion.div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+      >
+        <DialogTitle>
+          Delete Meeting
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the meeting "{meetingToDelete?.summary}"? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
